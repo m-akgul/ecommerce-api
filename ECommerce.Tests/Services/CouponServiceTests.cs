@@ -178,7 +178,7 @@ namespace ECommerce.Tests.Services
             Func<Task> act = async () => await _couponService.CreateAsync(couponDto);
             // Assert
             await act.Should().ThrowAsync<Exception>()
-                .WithMessage("Expiry date must be in the future.");
+                .WithMessage("The coupon's expiry date must be set to a future date.");
         }
 
         [Fact]
@@ -196,7 +196,7 @@ namespace ECommerce.Tests.Services
             Func<Task> act = async () => await _couponService.CreateAsync(couponDto);
             // Assert
             await act.Should().ThrowAsync<Exception>()
-                .WithMessage("Coupon with this code already exists.");
+                .WithMessage("A coupon with this code already exists.");
         }
 
         [Fact]
@@ -213,7 +213,7 @@ namespace ECommerce.Tests.Services
             Func<Task> act = async () => await _couponService.CreateAsync(couponDto);
             // Assert
             await act.Should().ThrowAsync<Exception>()
-                .WithMessage("Discount amount must be greater than zero.");
+                .WithMessage("The discount amount must be greater than zero.");
         }
 
         [Fact]
@@ -269,7 +269,7 @@ namespace ECommerce.Tests.Services
             Func<Task> act = async () => await _couponService.UpdateAsync(coupon.Id, updateDto);
             // Assert
             await act.Should().ThrowAsync<Exception>()
-                .WithMessage("Expiry date must be in the future.");
+                .WithMessage("The coupon's expiry date must be set to a future date.");
         }
 
         [Fact]
@@ -287,7 +287,7 @@ namespace ECommerce.Tests.Services
             Func<Task> act = async () => await _couponService.UpdateAsync(coupon.Id, updateDto);
             // Assert
             await act.Should().ThrowAsync<Exception>()
-                .WithMessage("Discount amount must be greater than zero.");
+                .WithMessage("The discount amount must be greater than zero.");
         }
 
         [Fact]

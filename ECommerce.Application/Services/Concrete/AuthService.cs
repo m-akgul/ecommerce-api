@@ -15,14 +15,12 @@ namespace ECommerce.Application.Services.Concrete
     {
         private readonly UserManager<AppUser> _userManager;
         private readonly RoleManager<AppRole> _roleManager;
-        private readonly SignInManager<AppUser> _signInManager;
         private readonly IConfiguration _config;
 
-        public AuthService(UserManager<AppUser> userManager, RoleManager<AppRole> roleManager, SignInManager<AppUser> signInManager, IConfiguration config)
+        public AuthService(UserManager<AppUser> userManager, RoleManager<AppRole> roleManager, IConfiguration config)
         {
             _userManager = userManager;
             _roleManager = roleManager;
-            _signInManager = signInManager;
             _config = config;
         }
 

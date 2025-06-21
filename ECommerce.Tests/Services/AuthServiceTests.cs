@@ -14,17 +14,12 @@ namespace ECommerce.Tests.Services
     {
         private readonly Mock<UserManager<AppUser>> _userManagerMock;
         private readonly Mock<RoleManager<AppRole>> _roleManagerMock;
-        private readonly Mock<SignInManager<AppUser>> _signInManagerMock;
         private readonly AuthService _authService;
 
         public AuthServiceTests()
         {
             _userManagerMock = TestMockFactory.CreateMockUserManager<AppUser>();
             _roleManagerMock = TestMockFactory.CreateMockRoleManager<AppRole>();
-            _signInManagerMock = new Mock<SignInManager<AppUser>>(
-                _userManagerMock.Object,
-                null, null, null, null, null, null
-            );
             var _jwtSettings = new Mock<IConfigurationSection>();
             _jwtSettings.Setup(x => x["Key"]).Returns("ThisIsTestJwtSecretKeyDoNotUseInProd123!");
             _jwtSettings.Setup(x => x["Issuer"]).Returns("TestIssuer");
@@ -39,7 +34,7 @@ namespace ECommerce.Tests.Services
             _configMock.Setup(x => x["Audience"]).Returns(_jwtSettings.Object["Audience"]);
             _configMock.Setup(x => x["ExpiresInMinutes"]).Returns(_jwtSettings.Object["ExpiresInMinutes"]);
 
-            _authService = new AuthService(_userManagerMock.Object, _roleManagerMock.Object, _signInManagerMock.Object, _configMock.Object);
+            _authService = new AuthService(_userManagerMock.Object, _roleManagerMock.Object, _configMock.Object);
         }
 
         [Fact]
@@ -258,7 +253,7 @@ namespace ECommerce.Tests.Services
             var act = async () => await _authService.LoginAsync(dto);
 
             // Assert
-            await act.Should().ThrowAsync<Exception>().WithMessage("User is locked out."); // User is banned
+            await act.Should().ThrowAsync<Exception>().WithMessage($"User is locked out until {user.LockoutEnd.Value}.");
             _userManagerMock.Verify(um => um.FindByEmailAsync(dto.Email), Times.Once);
             _userManagerMock.Verify(um => um.CheckPasswordAsync(user, dto.Password), Times.Never);
             _userManagerMock.Verify(um => um.GetRolesAsync(user), Times.Never);

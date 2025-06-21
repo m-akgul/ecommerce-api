@@ -52,13 +52,14 @@ namespace ECommerce.Tests.Controllers
             // Arrange
             var productId = Guid.NewGuid();
             var dto = new AddFavoriteDto { ProductId = productId };
-            _favoriteServiceMock.Setup(s => s.AddFavoriteAsync(userId, productId)).ReturnsAsync(new FavoriteDto());
+            var favoriteDto = new FavoriteDto { ProductId = productId, ProductName = "Product 1", ProductImage = "Image1.jpg", ProductPrice = 10.0m };
+            _favoriteServiceMock.Setup(s => s.AddFavoriteAsync(userId, productId)).ReturnsAsync(favoriteDto);
             // Act
             var result = await _controller.AddToFavorites(dto);
             // Assert
             result.Should().BeOfType<OkObjectResult>();
             var okResult = result as OkObjectResult;
-            okResult?.Value.Should().BeEquivalentTo(ApiResponse<FavoriteDto>.SuccessResponse(null, "Added to favorites."));
+            okResult?.Value.Should().BeEquivalentTo(ApiResponse<FavoriteDto>.SuccessResponse(favoriteDto, "Added to favorites."));
         }
 
         [Fact]

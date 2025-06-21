@@ -101,12 +101,12 @@ namespace ECommerce.Application.Services.Concrete
 
             if (dto.ExpiryDate < DateTime.UtcNow)
             {
-                throw new ArgumentOutOfRangeException("The coupon's expiry date must be set to a future date.");
+                throw new ArgumentException("The coupon's expiry date must be set to a future date.");
             }
 
             if (dto.DiscountAmount <= 0)
             {
-                throw new ArgumentOutOfRangeException("The discount amount must be greater than zero.");
+                throw new ArgumentException("The discount amount must be greater than zero.");
             }
 
             var coupon = new Coupon

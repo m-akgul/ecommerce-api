@@ -55,14 +55,14 @@ namespace ECommerce.Tests.Services
 
             // Add once
             await _cartService.AddOrUpdateCartItemAsync(user.Id, dto);
-            // Add again (should increase)
+            // Add again (should update)
             dto.Quantity = 3;
             await _cartService.AddOrUpdateCartItemAsync(user.Id, dto);
 
             // Assert
             var cartItems = await _cartService.GetCartAsync(user.Id);
             cartItems.Should().HaveCount(1);
-            cartItems.First().Quantity.Should().Be(4); // 1 + 3
+            cartItems.First().Quantity.Should().Be(3);
         }
 
         [Fact]

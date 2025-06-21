@@ -99,17 +99,27 @@ namespace ECommerce.Tests.Controllers
             // Arrange
             var couponCode = new ApplyCouponDto
             {
-                CouponCode = "DISCOUNT10"
+                CouponCode = "SUMMER2025"
             };
-            var couponDto = new CouponDto { Code = couponCode.CouponCode, DiscountAmount = 10 };
-            _couponServiceMock.Setup(x => x.ApplyCouponAsync(couponCode.CouponCode, Guid.NewGuid())).ReturnsAsync(couponDto);
+            var couponDto = new CouponDto
+            {
+                Id = Guid.NewGuid(),
+                Code = couponCode.CouponCode,
+                DiscountAmount = 10.0m,
+                ExpiryDate = DateTime.UtcNow.AddDays(30),
+                MaxUsageCount = 100,
+                MaxUsagePerUser = 1,
+                TotalUsageCount = 0,
+                IsActive = true
+            };
+            _couponServiceMock.Setup(x => x.ApplyCouponAsync(couponCode.CouponCode, userId)).ReturnsAsync(couponDto);
             // Act
             var result = await _cartController.ApplyCoupon(couponCode);
             // Assert
             result.Should().NotBeNull();
             result.Should().BeOfType<OkObjectResult>();
             var okResult = result as OkObjectResult;
-            okResult?.Value.Should().BeEquivalentTo(ApiResponse<CouponDto>.SuccessResponse(null, "Coupon applied successfully."));
+            okResult?.Value.Should().BeEquivalentTo(ApiResponse<CouponDto>.SuccessResponse(couponDto, "Coupon applied successfully."));
         }
 
         [Fact]

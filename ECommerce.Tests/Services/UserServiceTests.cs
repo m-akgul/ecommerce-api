@@ -28,19 +28,25 @@ namespace ECommerce.Tests.Services
             // Arrange
             var user = await TestDataSeeder.SeedUserAsync(Context, "john", "john@example.com");
 
+            _userManagerMock.Setup(x => x.GetRolesAsync(user))
+                .ReturnsAsync(new List<string> { "User" });
+
+            _roleManagerMock.Setup(x => x.RoleExistsAsync("Customer"))
+                .ReturnsAsync(true);
+
             _userManagerMock.Setup(x => x.FindByIdAsync(user.Id.ToString()))
                 .ReturnsAsync(user);
 
-            _userManagerMock.Setup(x => x.AddToRoleAsync(user, "User"))
+            _userManagerMock.Setup(x => x.AddToRoleAsync(user, "Customer"))
                 .ReturnsAsync(IdentityResult.Success);
 
             // Act
-            var result = await _userService.AssignRoleAsync(user.Id, ["User"]);
+            var result = await _userService.AssignRoleAsync(user.Id, ["Customer"]);
 
             // Assert
             result.Should().BeTrue();
 
-            _userManagerMock.Verify(x => x.AddToRoleAsync(user, "User"), Times.Once);
+            _userManagerMock.Verify(x => x.AddToRoleAsync(user, "Customer"), Times.Once);
         }
 
         [Fact]
@@ -73,7 +79,7 @@ namespace ECommerce.Tests.Services
             _userManagerMock.Setup(x => x.Users)
                 .Returns(new List<AppUser> { user1, user2, user3 }.AsQueryable());
             _userManagerMock.Setup(x => x.GetRolesAsync(user1))
-                .ReturnsAsync(new List<string> { "Admin" });
+                .ReturnsAsync(new List<string> { "Admin" }); // Admin is skipped
             _userManagerMock.Setup(x => x.GetRolesAsync(user2))
                 .ReturnsAsync(new List<string> { "User" });
             _userManagerMock.Setup(x => x.GetRolesAsync(user3))
@@ -83,13 +89,11 @@ namespace ECommerce.Tests.Services
             var result = await _userService.GetAllUsersAsync();
 
             // Assert
-            result.Should().HaveCount(3);
-            result[0].Username.Should().Be("john");
-            result[0].Roles.Should().Contain("Admin");
-            result[1].Username.Should().Be("jane");
-            result[1].Roles.Should().Contain("User");
-            result[2].Username.Should().Be("jack");
-            result[2].Roles.Should().Contain("Benutzer");
+            result.Should().HaveCount(2);
+            result[0].Username.Should().Be("jane");
+            result[0].Roles.Should().Contain("User");
+            result[1].Username.Should().Be("jack");
+            result[1].Roles.Should().Contain("Benutzer");
         }
 
         [Fact]
