@@ -20,6 +20,7 @@ namespace ECommerce.Application.Services.Concrete
         public async Task<List<RoleDto>> GetAllRolesAsync()
         {
             var roles = _roleManager.Roles
+                .Where(r => r.Name != "Admin")
                 .AsNoTracking()
                 .Select(r => new RoleDto
                 {
