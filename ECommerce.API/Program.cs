@@ -60,7 +60,7 @@ builder.Services.AddSwaggerGen(c =>
         Contact = new Microsoft.OpenApi.Models.OpenApiContact
         {
             Name = "GitHub Repository",
-            Url = new Uri("https://github.com/m-akgul/Ecommerce-api")
+            Url = new Uri("https://github.com/m-akgul/ecommerce-api")
         }
     });
 });
