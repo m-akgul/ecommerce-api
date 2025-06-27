@@ -47,7 +47,7 @@ namespace ECommerce.API.Controllers
         public async Task<IActionResult> Create(CreateCategoryDto dto)
         {
             var created = await _categoryService.CreateAsync(dto);
-            return CreatedAtAction("GetById", "categories", new { id = created.Id }, ApiResponse<CategoryDto>.SuccessResponse(created, "Category created."));
+            return CreatedAtAction(nameof(GetById), new { id = created.Id }, ApiResponse<CategoryDto>.SuccessResponse(created, "Category created."));
         }
 
         /// <summary>
@@ -106,6 +106,47 @@ namespace ECommerce.API.Controllers
                 throw new BusinessRuleException("Category not found.");
 
             return Ok(ApiResponse<string>.SuccessResponse(null, "Category deleted."));
+        }
+
+        /// <summary>
+        /// Gets all categories.
+        /// </summary>
+        /// <returns></returns>
+        /// <response code="200">Returns a list of categories.</response>
+        [HttpGet]
+        [ProducesResponseType(typeof(ApiResponse<List<CategoryDto>>), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetAll()
+        {
+            var categories = await _categoryService.GetAllAsync();
+            return Ok(ApiResponse<List<CategoryDto>>.SuccessResponse(categories));
+        }
+
+        /// <summary>
+        /// Gets a category by its ID.
+        /// </summary>
+        /// <param name="id">Category ID</param>
+        /// <returns></returns>
+        /// <remarks>
+        /// Sample request:
+        /// 
+        ///     GET /api/categories/{id}
+        ///     {
+        ///         "id": "12345678-1234-1234-1234-123456789012"
+        ///     }
+        /// </remarks>
+        /// <exception cref="BusinessRuleException"></exception>
+        /// <response code="200">Returns the category details.</response>
+        /// <response code="400">Category not found.</response>
+        [HttpGet("{id}")]
+        [ProducesResponseType(typeof(ApiResponse<CategoryDto>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> GetById(Guid id)
+        {
+            var category = await _categoryService.GetByIdAsync(id);
+            if (category is null)
+                throw new BusinessRuleException("Category not found.");
+
+            return Ok(ApiResponse<CategoryDto>.SuccessResponse(category));
         }
     }
 

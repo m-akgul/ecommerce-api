@@ -1,5 +1,6 @@
 using System.Reflection;
 using System.Text;
+using System.Text.Json;
 using System.Threading.RateLimiting;
 using ECommerce.API.Middleware;
 using ECommerce.Application.Services.Abstract;
@@ -105,7 +106,12 @@ builder.Services.AddAuthentication(options =>
         ValidateIssuerSigningKey = true,
         ValidIssuer = jwtConfig["Issuer"],
         ValidAudience = jwtConfig["Audience"],
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtConfig["Key"]))
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtConfig["Key"])),
+        LifetimeValidator = (notBefore, expires, token, parameters) =>
+        {
+            // Allow tokens to be valid for 1 minute after expiration
+            return expires.HasValue && expires.Value > DateTime.UtcNow.AddMinutes(-1);
+        }
     };
 });
 
@@ -192,6 +198,24 @@ if (app.Environment.IsDevelopment())
         options.RoutePrefix = string.Empty;
     });
 }
+
+app.Use(async (context, next) =>
+{
+    await next();
+
+    if (context.Response.StatusCode == 401 && !context.Response.HasStarted)
+    {
+        context.Response.ContentType = "application/json";
+        var response = JsonSerializer.Serialize(ApiResponse<string>.Fail("Unauthorized"));
+        await context.Response.WriteAsync(response);
+    }
+    else if (context.Response.StatusCode == 403 && !context.Response.HasStarted)
+    {
+        context.Response.ContentType = "application/json";
+        var response = JsonSerializer.Serialize(ApiResponse<string>.Fail("Forbidden"));
+        await context.Response.WriteAsync(response);
+    }
+});
 
 app.UseCors("CorsPolicy");
 app.UseHttpsRedirection();
