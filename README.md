@@ -2,6 +2,8 @@
 
 This project provides a fully working **ASP.NET Core 9 Web API** backend for an e-commerce platform. It features JWT authentication, role-based authorization, product and order management, coupon support, user profiles, admin functionalities, Google OAuth login, and built-in ASP.NET Core rate limiting.
 
+👉 A working Docker setup using this API is available in the companion repository: [m-akgul/ecommerce-docker](https://github.com/m-akgul/ecommerce-docker)
+
 ---
 
 ## 🚀 Technologies
